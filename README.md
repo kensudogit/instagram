@@ -1,49 +1,72 @@
-# Instagram自動化ツール
+# Instagram 自動化ツール
 
-このプロジェクトは、Pythonを使用してInstagramのアカウント運営を自動化するためのツールを含んでいます。提供されるツールは以下の通りです：
+このプロジェクトは、Instagram Graph APIを使用してさまざまなInstagramの活動を自動化するためのツールセットを提供します。ツールには以下が含まれます：
 
-1. **フィード投稿の自動化**: InstagramのAPIを使用してフィードコンテンツの投稿を自動化します。
-2. **ストーリー投稿ツール**: ストーリーの投稿を自動化します。
-3. **DM送信ツール**: ダイレクトメッセージの送信を自動化します。
-4. **フォローツール**: ユーザーのフォローを自動化します。
-5. **いいねツール**: 投稿へのいいねを自動化します。
-6. **コメントツール**: 投稿へのコメントを自動化します。
+1. **フィード投稿の自動化**: 複数のメディアアイテムをInstagramフィードに自動的に投稿します。
+2. **ストーリー投稿の自動化**: 複数のメディアアイテムをInstagramストーリーとして自動的に投稿します。
+3. **ダイレクトメッセージの自動化**: 複数のユーザーにダイレクトメッセージを送信します。
+4. **フォローの自動化**: 複数のユーザーをフォローします。
+5. **いいねの自動化**: 複数の投稿に「いいね」を送信します。
+6. **コメントの自動化**: 複数の投稿にコメントを送信します。
 
 ## セットアップ手順
 
-1. **環境設定**:
-   - システムにPythonがインストールされていることを確認します。
-   - 仮想環境を作成します。
-     ```bash
-     python -m venv venv
-     source venv/bin/activate  # Windowsの場合は `venv\Scripts\activate`
-     ```
-   - 必要なパッケージをインストールします。
-     ```bash
-     pip install requests pandas gspread oauth2client python-decouple schedule
-     ```
+1. **リポジトリをクローン**
+   ```bash
+   git clone <repository-url>
+   cd <repository-directory>
+   ```
 
-2. **Google Sheets APIの設定**:
-   - Google Cloud Platformプロジェクトを設定し、Google Sheets APIを有効にします。
-   - 認証情報のJSONファイルをダウンロードし、プロジェクトディレクトリに保存します。
-   - スクリプト内のパスを認証情報ファイルに更新します。
+2. **依存関係のインストール**
+   Pythonがインストールされていることを確認し、必要なパッケージをインストールします：
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-3. **Instagram APIの設定**:
-   - Facebook Developerでアプリを登録し、Instagram Graph APIアクセスを取得します。
-   - アクセストークンとユーザーIDを取得します。
-   - これらを`.env`ファイルに以下の形式で保存します。
-     ```
-     INSTAGRAM_ACCESS_TOKEN=your_actual_access_token
-     INSTAGRAM_USER_ID=your_actual_user_id
-     ```
+3. **環境変数の設定**
+   ルートディレクトリに `.env` ファイルを作成し、Instagram APIの認証情報を追加します：
+   ```
+   INSTAGRAM_ACCESS_TOKEN=your_access_token
+   INSTAGRAM_USER_ID=your_user_id
+   ```
 
-4. **スクリプトの実行**:
-   - コマンドラインからスクリプトを実行し、必要な引数を指定します。
-     ```bash
-     python feed_post_automation.py --media_url "http://example.com/image.jpg" --caption "Your caption here" --schedule_time "14:00"
-     ```
-   - メディアURL、キャプション、スケジュール時間が正しく指定されていることを確認します。
+4. **Google Sheets APIのセットアップ**
+   - Google Sheets APIを有効にし、サービスアカウントを作成します。
+   - 認証情報のJSONファイルをダウンロードし、プロジェクトディレクトリに配置します。
+   - スクリプト内のパスをあなたの認証ファイルのパスに更新します。
 
-5. **ログとモニタリング**:
-   - `instagram_automation.log`ファイルを確認し、スクリプト実行に関するログを確認します。
-   - ログには成功した投稿や発生したエラーの情報が含まれます。
+5. **スクリプトの実行**
+   以下のコマンドを使用してスクリプトを実行できます：
+   ```bash
+   python devlop/instagram/feed_post_automation.py --media_url <media_url> --caption <caption> --schedule_time <HH:MM>
+   ```
+
+## 実装された機能
+
+このプロジェクトには以下の自動化機能が含まれています：
+
+1. **フィード投稿の自動化**
+   - 関数: `bulk_upload_media(media_urls, captions)`
+   - 説明: 指定されたキャプションで複数のメディアアイテムをInstagramフィードに自動的に投稿します。エラーを処理し、失敗したアップロードをリトライします。
+
+2. **ストーリー投稿の自動化**
+   - 関数: `bulk_upload_stories(media_urls)`
+   - 説明: 複数のメディアアイテムをInstagramストーリーとして自動的に投稿します。エラーハンドリングとリトライロジックを含みます。
+
+3. **ダイレクトメッセージの自動化**
+   - 関数: `bulk_send_dm(user_ids, message)`
+   - 説明: 複数のユーザーにダイレクトメッセージを送信します。エラーハンドリングと失敗したメッセージのリトライを含みます。
+
+4. **フォローの自動化**
+   - 関数: `bulk_follow_users(user_ids)`
+   - 説明: 複数のユーザーを自動的にフォローします。エラーハンドリングとリトライを含みます。
+
+5. **いいねの自動化**
+   - 関数: `bulk_like_posts(post_ids)`
+   - 説明: 複数の投稿に自動的に「いいね」を送信します。エラーを処理し、失敗した試行をリトライします。
+
+6. **コメントの自動化**
+   - 関数: `bulk_comment_posts(post_ids, comments)`
+   - 説明: 指定されたコメントで複数の投稿にコメントを送信します。エラーハンドリングとリトライロジックを含みます。
+
+各関数はエラーを適切に処理し、成功するまでリトライするメカニズムを備えています。環境変数とAPI認証情報をセットアップ手順に従って設定してください。
