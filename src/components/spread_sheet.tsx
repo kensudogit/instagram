@@ -3,6 +3,8 @@ import axios from 'axios';
 import './spread_sheet.css';
 import { v4 as uuidv4 } from 'uuid';
 import { jsPDF } from 'jspdf';
+import psycopg2
+from psycopg2 import sql
 
 // Define a type for the spreadsheet row
 interface SpreadsheetRow {
@@ -52,6 +54,56 @@ const autoReply = async (content: string) => {
     console.error('Error sending auto-reply:', error.response ? error.response.data : error.message);
   }
 };
+
+// PostgreSQLの設定
+DB_NAME = config('DB_NAME', default='your_db_name')
+DB_USER = config('DB_USER', default='your_db_user')
+DB_PASSWORD = config('DB_PASSWORD', default='your_db_password')
+DB_HOST = config('DB_HOST', default='localhost')
+DB_PORT = config('DB_PORT', default='5432')
+
+// PostgreSQLに接続する関数
+def connect_to_postgresql():
+    try:
+        conn = psycopg2.connect(
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            host=DB_HOST,
+            port=DB_PORT
+        )
+        logging.info("Connected to PostgreSQL database")
+        return conn
+    except Exception as e:
+        logging.error(f"Failed to connect to PostgreSQL: {e}")
+        return None
+
+// スプレッドシートからデータを取得し、PostgreSQLに登録する関数
+def register_data_to_postgresql():
+    conn = connect_to_postgresql()
+    if not conn:
+        return
+
+    cursor = conn.cursor()
+
+    try:
+        // スプレッドシートからデータを取得
+        data = sheet.get_all_records()
+
+        // データをPostgreSQLに挿入
+        for record in data:
+            insert_query = sql.SQL(
+                "INSERT INTO your_table_name (column1, column2) VALUES (%s, %s)"
+            )
+            cursor.execute(insert_query, (record['column1'], record['column2']))
+
+        conn.commit()
+        logging.info("Data registered to PostgreSQL successfully")
+    except Exception as e:
+        logging.error(f"Failed to register data to PostgreSQL: {e}")
+    finally:
+        cursor.close()
+        conn.close()
 
 // スプレッドシートのデータを管理し、投稿や自動返信を行うコンポーネント
 const SpreadSheet = () => {
@@ -166,6 +218,10 @@ const SpreadSheet = () => {
     console.log('Find function executed');
   };
 
+  const regist = () => {
+    console.log('Register button clicked');
+  };
+
   return (
     <div>
       <div className="button-container">
@@ -173,6 +229,8 @@ const SpreadSheet = () => {
         <button onClick={exportToCSV}>CSV</button>
         <button onClick={find}>検索</button>
         <button onClick={addRow}>行追加</button>
+        <button onClick={regist}>登録</button>
+        <button onClick={handleAutoReply}>自動返信</button>
       </div>
       <p>{statusMessage}</p>
       <div className="table-container">

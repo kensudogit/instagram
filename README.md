@@ -9,37 +9,47 @@
 5. **いいねの自動化**: 複数の投稿に「いいね」を送信します。
 6. **コメントの自動化**: 複数の投稿にコメントを送信します。
 
-## セットアップ手順
+## 導入手順
 
-1. **リポジトリをクローン**
+1. リポジトリをクローンします。
    ```bash
    git clone <repository-url>
-   cd <repository-directory>
    ```
 
-2. **依存関係のインストール**
-   Pythonがインストールされていることを確認し、必要なパッケージをインストールします：
+2. 必要なPythonパッケージをインストールします。
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **環境変数の設定**
-   ルートディレクトリに `.env` ファイルを作成し、Instagram APIの認証情報を追加します：
+3. `.env`ファイルを作成し、以下の環境変数を設定します。
    ```
    INSTAGRAM_ACCESS_TOKEN=your_access_token
    INSTAGRAM_USER_ID=your_user_id
+   DB_NAME=your_db_name
+   DB_USER=your_db_user
+   DB_PASSWORD=your_db_password
+   DB_HOST=localhost
+   DB_PORT=5432
    ```
 
-4. **Google Sheets APIのセットアップ**
-   - Google Sheets APIを有効にし、サービスアカウントを作成します。
-   - 認証情報のJSONファイルをダウンロードし、プロジェクトディレクトリに配置します。
-   - スクリプト内のパスをあなたの認証ファイルのパスに更新します。
+4. Google Sheets APIの認証情報を設定します。`credentials.json`ファイルをプロジェクトのルートディレクトリに配置します。
 
-5. **スクリプトの実行**
-   以下のコマンドを使用してスクリプトを実行できます：
+5. Flaskサーバーを起動します。
    ```bash
-   python devlop/instagram/feed_post_automation.py --media_url <media_url> --caption <caption> --schedule_time <HH:MM>
+   python devlop/instagram/feed_post_automation.py
    ```
+
+## 機能内容
+
+- **メディアのアップロード**: 指定したURLのメディアをInstagramに投稿します。キャプションを追加することも可能です。
+- **スケジュール投稿**: 指定した時間にメディアを自動で投稿します。
+- **一括投稿**: 複数のメディアを順次投稿します。
+- **ストーリー投稿**: メディアをInstagramストーリーとして投稿します。
+- **DM送信**: 指定したユーザーにダイレクトメッセージを送信します。
+- **フォロー**: 指定したユーザーをフォローします。
+- **いいね**: 指定した投稿に「いいね」を送信します。
+- **コメント**: 指定した投稿にコメントを送信します。
+- **データ登録**: Google Sheetsからデータを取得し、PostgreSQLに登録します。
 
 ## 実装された機能
 

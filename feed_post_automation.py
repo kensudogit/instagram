@@ -8,6 +8,9 @@ import os
 import schedule
 import argparse
 from decouple import config
+from flask import Flask, request, jsonify
+import psycopg2
+from psycopg2 import sql
 
 # Google Sheets APIの設定
 # Google Sheetsにアクセスするためのスコープを定義
@@ -31,6 +34,54 @@ USER_ID = config('INSTAGRAM_USER_ID', default='your_user_id')
 # ログファイルに情報を記録
 logging.basicConfig(filename='instagram_automation.log', level=logging.INFO,
                     format='%(asctime)s:%(levelname)s:%(message)s')
+
+# PostgreSQLの設定
+DB_NAME = config('DB_NAME', default='your_db_name')
+DB_USER = config('DB_USER', default='your_db_user')
+DB_PASSWORD = config('DB_PASSWORD', default='your_db_password')
+DB_HOST = config('DB_HOST', default='localhost')
+DB_PORT = config('DB_PORT', default='5432')
+
+def connect_to_postgresql():
+    try:
+        conn = psycopg2.connect(
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            host=DB_HOST,
+            port=DB_PORT
+        )
+        logging.info("Connected to PostgreSQL database")
+        return conn
+    except Exception as e:
+        logging.error(f"Failed to connect to PostgreSQL: {e}")
+        return None
+
+def register_data_to_postgresql():
+    conn = connect_to_postgresql()
+    if not conn:
+        return
+
+    cursor = conn.cursor()
+
+    try:
+        # スプレッドシートからデータを取得
+        data = sheet.get_all_records()
+
+        # データをPostgreSQLに挿入
+        for record in data:
+            insert_query = sql.SQL(
+                "INSERT INTO your_table_name (column1, column2) VALUES (%s, %s)"
+            )
+            cursor.execute(insert_query, (record['column1'], record['column2']))
+
+        conn.commit()
+        logging.info("Data registered to PostgreSQL successfully")
+    except Exception as e:
+        logging.error(f"Failed to register data to PostgreSQL: {e}")
+    finally:
+        cursor.close()
+        conn.close()
 
 # Instagramにメディアをアップロードする関数
 # エラーハンドリングとリトライ機能を含む
@@ -247,9 +298,17 @@ def bulk_comment_posts(post_ids, comments, retries=3):
         else:
             logging.error(f"All attempts to comment on post {post_id} failed.")
 
-if __name__ == '__main__':
-    main()
+app = Flask(__name__)
 
-media_urls = ['http://example.com/image1.jpg', 'http://example.com/image2.jpg']
-captions = ['Caption for image 1', 'Caption for image 2']
-bulk_upload_media(media_urls, captions) 
+@app.route('/register', methods=['POST'])
+def register_data():
+    try:
+        register_data_to_postgresql()
+        return jsonify({"message": "Data registered successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(port=8080)
+
+INSTAGRAM_GRAPH_API_URL = "https://graph.instagram.com/" 
