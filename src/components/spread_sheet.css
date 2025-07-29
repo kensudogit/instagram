@@ -18,12 +18,16 @@ button {
   background-color: #003366;
   color: white;
   padding: 5px 10px;
-  margin: 1px;
+  margin: 0;
   border: none;
   border-radius: 12px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  width: 80px;
+  width: 90px;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 button:hover {
@@ -82,6 +86,13 @@ input {
   display: flex;
   justify-content: flex-start;
   margin-bottom: 10px;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+/* 自動返信ボタン専用のスタイル */
+.button-container button:last-child {
+  font-size: 10px;
 }
 
 tr {
